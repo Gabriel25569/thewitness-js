@@ -25,55 +25,46 @@
 
 var Game = {
 
-    init: function(parent, options, theme) {
-        Game._graphics = new Graphics(parent, options, theme);
+    init: function(parent, theme) {
+        let stage = document.createElement("div");
+        let layers = new Array(2);
+
+        for (let i = 0; i < 2; i++)
+        {
+            let layer = document.createElement("canvas");
+            layer.style.zIndex = i;
+            layer.style.position = "absolute";
+            stage.appendChild(layer);
+            layers[i] = layer;
+        }
+        parent.appendChild(stage);
+
+        Game._stage = stage;
+
+        Game._graphics = new Graphics(layers, theme);
 
         Game._currentPuzzle = null;
         Game._snake = null;
 
-        for (let i = 0; i < 3; i++)
-        {
-            let layer = document.createElement("canvas");
+        // function frame() {
+        //     Game._now = Game._timestamp();
+        //     Game._dt = Game._dt + Math.min(1, (Game._now - Game._last) / 1000);
+        //     while(Game._dt > Game._step) {
+        //             Game._dt = Game._dt - Game._step;
+        //             Game._update(Game._step);
+        //     }
+        //     Game._render(Game._dt);
+        //     Game._last = Game._now;
+        //     requestAnimationFrame(frame);
+        // }
 
-            layer.style.zIndex = i;
-            layer.style.position = "absolute";
-
-            switch (i)
-            {
-                case 0:
-                    layer.id = "background-layer";
-                    this._bgLayer = layer;
-                    break;
-                case 1:
-                    layer.id = "game-layer";
-                    this._gameLayer = layer;
-                    break;
-                case 2:
-                    layer.id = "snake-layer";
-                    this._snakeLayer = layer;
-                    break;
-            }   
-
-            this._stage.appendChild(layer);
-        }
-
-        function frame() {
-            Game._now = Game._timestamp();
-            Game._dt = Game._dt + Math.min(1, (Game._now - Game._last) / 1000);
-            while(Game._dt > Game._step) {
-                    Game._dt = Game._dt - Game._step;
-                    Game._update(Game._step);
-            }
-            Game._render(Game._dt);
-            Game._last = Game._now;
-            requestAnimationFrame(frame);
-        }
-
-        requestAnimationFrame(frame);
+        // requestAnimationFrame(frame);
     },
 
     loadPuzzle : function(puzzle) {
-        this._graphics.drawPuzzle(puzzle);
+        Game._graphics.drawPuzzle(puzzle);
+        Game._stage.style.width = Game._graphics.getWidth();
+        Game._stage.style.height = Game._graphics.getHeight();
         //Game._currentPuzzle = puzzle;
     },
 
@@ -96,13 +87,15 @@ var Game = {
 }
 
 window.onload = function main() {
-    let puzzle = new Puzzle(3, 3, {});
+    let options = {blockSize: 100, margin: 50, pathSize: 25};
+    let puzzle = new Puzzle(3, 3, {}, options);
+    let testElement = new Element(ELEMENT_TYPE.HEXAGON, LOCATION_TYPE.BLOCK, {x: 0, y:0})
+    puzzle.addElement(testElement);
 
     let theme = new Theme("#F9B700", "#3B280A", "#FFFFFF");
-    let options = {blockSize: 100, margin: 50, pathSize: 25};
     let stage = document.getElementById("stage");
 
-    Game.init(document.body, options, theme);
+    Game.init(document.body, theme);
     Game.loadPuzzle(puzzle);
 
 

@@ -1,82 +1,76 @@
 class Graphics {
 
-    constructor(layers, options, theme) {
-        this._stage = document.createElement("div");
+    constructor (layers, theme) {
+        this._puzzleLayer = layers[0];
+        this._snakeLayer = layers[1];
 
-        parent.appendChild(this._stage);
+        this._width = 0;
+        this._height = 0;
 
-
-        this._pathSize = options.pathSize;
-        this._blockSize = options.blockSize;
-        this._margin = options.margin;
-
-        this._options = options;
         this._theme = theme;
     }
 
-    drawPuzzle(puzzle) {
-        let margin = this._options.margin;
-        let pathSize = this._options.pathSize;
-        let blockSize = this._options.blockSize;
-        
-        let width = 2 * margin + puzzle.Rows * blockSize + ((puzzle.Rows + 1) * pathSize);
-        let height = 2 * margin + puzzle.Columns * blockSize + ((puzzle.Columns + 1) * pathSize);
+    drawPuzzle (puzzle) {
+        let margin = puzzle.options.margin;
+        let pathSize = puzzle.options.pathSize;
+        let blockSize = puzzle.options.blockSize;
+        let rows = puzzle.rows;
+        let columns = puzzle.columns;
 
-        // Configure stage
-        this._stage.style.width = width;
-        this._stage.style.height = height;
+        let width = 2 * margin + rows * blockSize + ((rows + 1) * pathSize);
+        let height = 2 * margin + columns * blockSize + ((columns + 1) * pathSize);
 
-        this._bgLayer.width = width;
-        this._bgLayer.height = height;
+        this._width = width;
+        this._height = height;
 
-        this._gameLayer.width = width - 2 * margin;
-        this._gameLayer.height = height - 2 * margin;
-        this._gameLayer.style.top = margin;
-        this._gameLayer.style.left = margin;
+        this._puzzleLayer.width = width;
+        this._puzzleLayer.height = height;
 
-        this._snakeLayer.width = width - 2 * margin;
-        this._snakeLayer.height = height - 2 * margin;
-        this._snakeLayer.style.top = margin;
-        this._snakeLayer.style.left = margin;
+        this._snakeLayer.width = this._width;
+        this._snakeLayer.height = this._height;
 
-        let bgCtx = this._bgLayer.getContext("2d");
-        let gameCtx = this._gameLayer.getContext("2d");
+        let ctx = this._puzzleLayer.getContext("2d");
 
         // Game background
-        this._drawRectangle(0, 0, this._bgLayer.width, this._bgLayer.height, 
+        this._drawRectangle(0, 0, width, height, 
                             {radius: [0, 0, 0, 0], width: 0}, 
-                            {fill: this._theme.Background , stroke: "#000000"}, 
-                            bgCtx
+                            {fill: this._theme.background , stroke: "#000000"}, 
+                            ctx
                            );
         
+
         // Puzzle Background
-        this._drawRectangle(0, 0, this._gameLayer.width, this._gameLayer.height, 
+        this._drawRectangle(margin, margin, width - 2 * margin, height - 2 * margin, 
                             {radius: [8, 8, 8, 8], width: 0}, 
-                            {fill: this._theme.Path , stroke: this._theme.Path}, 
-                            gameCtx
+                            {fill: this._theme.path , stroke: this._theme.path}, 
+                            ctx
                            );
 
         // Puzzle blocks
-        for (let i = 0; i < puzzle.Rows; i++) {
-            for (let j = 0; j < puzzle.Columns; j++) {
-                this._drawRectangle(i * blockSize + ((i+1) * pathSize), 
-                                    j * blockSize + ((j+1) * pathSize), 
+        for (let i = 0; i < rows; i++) {
+            for (let j = 0; j < columns; j++) {
+                
+                this._drawRectangle(margin + i * blockSize + ((i+1) * pathSize), 
+                                    margin + j * blockSize + ((j+1) * pathSize), 
                                     blockSize, blockSize, 
                                     {radius: [0, 0, 0, 0], width: 0}, 
-                                    {fill: "#F9B700" , stroke: "#F9B700"}, 
-                                    gameCtx
+                                    {fill: this._theme.background , stroke: this._theme.background}, 
+                                    ctx
                                    );
+                if (puzzle.blocks[i][j] != null)
+                {
+                    // Draw block elements
+                }
             }
         }
 
-        // Draw puzzle elements
+        // Draw node and edge elements
     }
 
-    drawSnake(snake) {
-
+    drawSnake (snake) {
     }
 
-    lockPointer() {
+    lockPointer () {
         this._gameLayer.requestPointerLock();
     }
 
@@ -86,7 +80,7 @@ class Graphics {
     // Style  
     // -> fill: string (color)
     // -> stroke: string (color)
-    _drawRectangle(x, y, w, h, border, style, ctx) {
+    _drawRectangle (x, y, w, h, border, style, ctx) {
         let nw = x + w;
         let nh = y + h;
         
@@ -118,14 +112,24 @@ class Graphics {
         ctx.stroke();
     }
 
-    _drawCircle(x, y, r, fillStyle) {
+    _drawCircle (x, y, r, fillStyle, ctx) {
         ctx.beginPath();
         ctx.arc(x, y, r, 0, 2*Math.PI)
         ctx.closePath();
         
-        ctx.fillStyle = fillStyle;
+        ctx.fillStyle = fillStyle.fill;
 
         ctx.fill();
         ctx.stroke();
+    }
+
+    getWidth ()
+    {
+        return this._width;
+    }
+
+    getHeight ()
+    {
+        return this._height;
     }
 }

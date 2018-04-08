@@ -6,17 +6,17 @@ class Theme {
     
     constructor (background, path, snake) {
         this._re = /^#[1234567890ABCDEF]{6}$/;
-        this.Background = background;
-        this.Path = path;
-        this.Snake = snake;
+        this.background = background;
+        this.path = path;
+        this.snake = snake;
     }
 
-    get Background ()
+    get background ()
     {
         return this._background;
     }
 
-    set Background (value)
+    set background (value)
     {
         if (this._re.test(value))
             this._background = value;
@@ -24,12 +24,12 @@ class Theme {
             throw "Invalid background color for theme."
     }
 
-    get Path ()
+    get path ()
     {
         return this._path;
     }
 
-    set Path (value)
+    set path (value)
     {
         if (this._re.test(value))
             this._path = value;
@@ -37,12 +37,12 @@ class Theme {
             throw "Invalid path color for theme."
     }
 
-    get Snake ()
+    get snake ()
     {
         return this._snake;
     }
 
-    set Snake (value)
+    set snake (value)
     {
         if (this._re.exec(value))
             this._snake = value;
