@@ -72,7 +72,7 @@ class Graphics {
                 switch (puzzle.nodeElements[i].type) {
                     case NODE_ELEMENT_TYPE.START:
                         let coord = puzzle.getNodeCoordinate(i);
-                        this._drawCircle(coord.x, coord.y, START_RADIUS * pathSize,
+                        this._drawCircle(coord.x, coord.y, Math.floor(START_RADIUS * pathSize),
                                          this._theme.path,
                                          ctx)
                         break;
@@ -84,14 +84,20 @@ class Graphics {
     }
 
     drawSnake (snake) {
+        this.clearSnake();
         let pathSize = this._puzzle.options.pathSize;
         let ctx = this._snakeLayer.getContext("2d");
 
         let coord = this._puzzle.getNodeCoordinate(snake.nodeStack[0]);
-        this._drawCircle(coord.x, coord.y, START_RADIUS * pathSize,
+        this._drawCircle(coord.x, coord.y, Math.floor(START_RADIUS * pathSize),
                          this._theme.snake,
                          ctx);
 
+    }
+
+    clearSnake () {
+        let ctx = this._snakeLayer.getContext("2d");
+        ctx.clearRect(0, 0, this.width, this.height);
     }
 
     // Border

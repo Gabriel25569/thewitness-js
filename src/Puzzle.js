@@ -79,7 +79,7 @@ class Puzzle {
             let dy = y - cy;
             let d = Math.sqrt((dx * dx) + (dy * dy));
 
-            if (d <= START_RADIUS * this._options.pathSize) {
+            if (d <= Math.floor(START_RADIUS * this._options.pathSize)) {
                 return startNodes[i];
             }
         }

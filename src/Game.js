@@ -56,16 +56,21 @@ var Game = {
             Game._canvas.requestPointerLock();
             Game._snake = new Snake(startIndex);
 
-            // DEBUG!!
-            Game._graphics.drawSnake(Game._snake);
-
             Game._canvas.addEventListener('mousemove', Game._mouseMove, false);
-            Game._canvas.addEventListener('pointerlockchange', Game._mouseExit, false);
+            document.addEventListener('pointerlockchange', Game._mouseExit, false);
+
+            Game._graphics.drawSnake(Game._snake);
         }
     },
 
     _mouseExit: function (e) {
-
+        if (document.pointerLockElement != Game._canvas)
+        {
+            Game._snake = null;
+            Game._graphics.clearSnake();
+            Game._canvas.removeEventListener('mousemove', Game._mouseMove, false);
+            document.removeEventListener('pointerlockchange', Game._mouseExit, false);
+        }
     },
 
     _mouseMove: function (e) {
@@ -73,6 +78,8 @@ var Game = {
         var movementY = e.movementY || 0;
 
         console.log(movementX + "; " + movementY);
+        
+        Game._graphics.drawSnake(Game._snake);
 
         // x += movementX;
         // y += movementY;
