@@ -10,15 +10,17 @@ class Graphics {
         this._theme = theme;
     }
 
-    drawPuzzle (puzzle) {
+    setPuzzle (puzzle) {
         let margin = puzzle.options.margin;
         let pathSize = puzzle.options.pathSize;
         let blockSize = puzzle.options.blockSize;
         let rows = puzzle.rows;
         let columns = puzzle.columns;
 
-        let width = 2 * margin + rows * blockSize + ((rows + 1) * pathSize);
-        let height = 2 * margin + columns * blockSize + ((columns + 1) * pathSize);
+        let width = 2 * margin + columns * blockSize + ((columns + 1) * pathSize);
+        let height = 2 * margin + rows * blockSize + ((rows + 1) * pathSize);
+
+        this._puzzle = puzzle;
 
         this._width = width;
         this._height = height;
@@ -32,34 +34,48 @@ class Graphics {
         let ctx = this._puzzleLayer.getContext("2d");
 
         // Game background
-        this._drawRectangle(0, 0, width, height, 
-                            {radius: [0, 0, 0, 0], width: 0}, 
-                            {fill: this._theme.background , stroke: "#000000"}, 
+        this._drawRectangle(0, 0, width, height,
+                            {radius: [0, 0, 0, 0], width: 0},
+                            {fill: this._theme.background , stroke: "#000000"},
                             ctx
                            );
-        
+
 
         // Puzzle Background
-        this._drawRectangle(margin, margin, width - 2 * margin, height - 2 * margin, 
-                            {radius: [8, 8, 8, 8], width: 0}, 
-                            {fill: this._theme.path , stroke: this._theme.path}, 
+        this._drawRectangle(margin, margin, width - 2 * margin, height - 2 * margin,
+                            {radius: [8, 8, 8, 8], width: 0},
+                            {fill: this._theme.path , stroke: this._theme.path},
                             ctx
                            );
 
         // Puzzle blocks
-        for (let i = 0; i < rows; i++) {
-            for (let j = 0; j < columns; j++) {
-                
-                this._drawRectangle(margin + i * blockSize + ((i+1) * pathSize), 
-                                    margin + j * blockSize + ((j+1) * pathSize), 
-                                    blockSize, blockSize, 
-                                    {radius: [0, 0, 0, 0], width: 0}, 
-                                    {fill: this._theme.background , stroke: this._theme.background}, 
+        for (let i = 0; i < columns; i++) {
+            for (let j = 0; j < rows; j++) {
+
+                this._drawRectangle(margin + i * blockSize + ((i+1) * pathSize),
+                                    margin + j * blockSize + ((j+1) * pathSize),
+                                    blockSize, blockSize,
+                                    {radius: [0, 0, 0, 0], width: 0},
+                                    {fill: this._theme.background , stroke: this._theme.background},
                                     ctx
                                    );
-                if (puzzle.blocks[i][j] != null)
-                {
+                //if (puzzle.blocks[i][j] != null)
+                //{
                     // Draw block elements
+                //}
+            }
+        }
+
+        // Nodes
+        for (let i = 0; i < puzzle.nodeElements.length; i++) {
+            if (puzzle.nodeElements[i] != null) {
+                switch (puzzle.nodeElements[i].type) {
+                    case NODE_ELEMENT_TYPE.START:
+                        let coord = puzzle.getNodeCoordinate(i);
+                        this._drawCircle(coord.x, coord.y, START_RADIUS * pathSize,
+                                         this._theme.path,
+                                         ctx)
+                        break;
                 }
             }
         }
@@ -68,30 +84,34 @@ class Graphics {
     }
 
     drawSnake (snake) {
+        let pathSize = this._puzzle.options.pathSize;
+        let ctx = this._snakeLayer.getContext("2d");
+
+        let coord = this._puzzle.getNodeCoordinate(snake.nodeStack[0]);
+        this._drawCircle(coord.x, coord.y, START_RADIUS * pathSize,
+                         this._theme.snake,
+                         ctx);
+
     }
 
-    lockPointer () {
-        this._gameLayer.requestPointerLock();
-    }
-
-    // Border 
+    // Border
     // -> radius: [tl, tr, bl, br]
     // -> width: int
-    // Style  
+    // Style
     // -> fill: string (color)
     // -> stroke: string (color)
     _drawRectangle (x, y, w, h, border, style, ctx) {
         let nw = x + w;
         let nh = y + h;
-        
+
         let br = 0;
         if (border.radius)
             br = {tl: border.radius[0], tr: border.radius[1], br: border.radius[2], bl: border.radius[3]};
         else
             br = {tl: 0, tr: 0, br: 0, bl:0};
-    
+
         ctx.beginPath();
-    
+
         ctx.moveTo(x, y + br.tl);
         ctx.arc(x + br.tl, y + br.tl, br.tl, Math.PI, Math.PI * 1.5);
         ctx.lineTo(nw - br.tr, y);
@@ -101,12 +121,12 @@ class Graphics {
         ctx.lineTo(x + br.tl, nh);
         ctx.arc(x + br.bl, nh - br.bl, br.bl, Math.PI * 0.5, Math.PI);
         ctx.lineTo(x, y + br.tl);
-    
+
         ctx.closePath();
-    
+
         ctx.fillStyle = style.fill;
         ctx.fill();
-    
+
         ctx.strokeStyle = style.stroke;
         ctx.lineWidth = border.width;
         ctx.stroke();
@@ -116,19 +136,18 @@ class Graphics {
         ctx.beginPath();
         ctx.arc(x, y, r, 0, 2*Math.PI)
         ctx.closePath();
-        
-        ctx.fillStyle = fillStyle.fill;
+
+        ctx.fillStyle = fillStyle;
 
         ctx.fill();
-        ctx.stroke();
     }
 
-    getWidth ()
+    get width ()
     {
         return this._width;
     }
 
-    getHeight ()
+    get height ()
     {
         return this._height;
     }
