@@ -1,31 +1,5 @@
-
-// cnv.addEventListener('click', function(e) {
-//     cnv.requestPointerLock();
-//     x = e.clientX - cnv.offsetLeft;
-//     y = e.clientY - cnv.offsetTop;
-//     cnv.addEventListener('mousemove', function(e) {
-//         canvasLoop(e);
-//     }, false);
-// });
-
-// function canvasLoop(e) {
-//     var movementX = e.movementX || 0;
-//     var movementY = e.movementY || 0;
-  
-//     x += movementX;
-//     y += movementY;
-  
-//     //canvasDraw();
-  
-//     //var animation = requestAnimationFrame(canvasLoop);
-    
-//     Rectangle(x, y, 5, 5, {radius: [0, 0, 0, 0], width: 0}, {fill: "#FFFFFF" , stroke: "#FFFFFF"}, ctx);
-//   }
-
-
 var Game = {
-
-    init: function(parent, theme) {
+    init: function (parent, theme) {
         let stage = document.createElement("div");
         let layers = new Array(2);
 
@@ -37,14 +11,16 @@ var Game = {
             stage.appendChild(layer);
             layers[i] = layer;
         }
+
         parent.appendChild(stage);
 
         Game._stage = stage;
 
-        Game._graphics = new Graphics(layers, theme);
+        Game._canvas = layers[1];
+        Game._canvas.addEventListener("click", Game._mouseClick, false);
 
+        Game._graphics = new Graphics(layers, theme);
         Game._currentPuzzle = null;
-        Game._snake = null;
 
         // function frame() {
         //     Game._now = Game._timestamp();
@@ -61,42 +37,69 @@ var Game = {
         // requestAnimationFrame(frame);
     },
 
-    loadPuzzle : function(puzzle) {
-        Game._graphics.drawPuzzle(puzzle);
-        Game._stage.style.width = Game._graphics.getWidth();
-        Game._stage.style.height = Game._graphics.getHeight();
-        //Game._currentPuzzle = puzzle;
+    loadPuzzle : function (puzzle) {
+        Game._graphics.setPuzzle(puzzle);
+        Game._puzzle = puzzle;
+        Game._snake = null;
+
+        Game._stage.style.width = Game._graphics.width;
+        Game._stage.style.height = Game._graphics.height;
     },
 
-    _mouseClick: function(e) {
-        this._graphics.lockPointer();
+    _mouseClick: function (e) {
+        let x = e.clientX - Game._canvas.offsetLeft;
+        let y = e.clientY - Game._canvas.offsetTop;
+
+        let startIndex = Game._puzzle.getStartNode(x, y);
+        if (startIndex != -1)
+        {
+            Game._canvas.requestPointerLock();
+            Game._snake = new Snake(startIndex);
+
+            // DEBUG!!
+            Game._graphics.drawSnake(Game._snake);
+
+            Game._canvas.addEventListener('mousemove', Game._mouseMove, false);
+            Game._canvas.addEventListener('pointerlockchange', Game._mouseExit, false);
+        }
     },
 
-    _update: function() {
+    _mouseExit: function (e) {
 
     },
 
-    _render: function() {
+    _mouseMove: function (e) {
+        var movementX = e.movementX || 0;
+        var movementY = e.movementY || 0;
+
+        console.log(movementX + "; " + movementY);
+
+        // x += movementX;
+        // y += movementY;
+        //
+        // canvasDraw();
+        //
+        // Rectangle(x, y, 5, 5, {radius: [0, 0, 0, 0], width: 0}, {fill: "#FFFFFF" , stroke: "#FFFFFF"}, ctx);
+    },
+
+    _update: function () {
 
     },
 
-    _timestamp: function() {
-        return window.performance && window.performance.now ? window.performance.now() : new Date().getTime();
-    }
+    _render: function () {
 
+    },
 }
 
-window.onload = function main() {
+window.onload = function main () {
     let options = {blockSize: 100, margin: 50, pathSize: 25};
-    let puzzle = new Puzzle(3, 3, {}, options);
-    let testElement = new Element(ELEMENT_TYPE.HEXAGON, LOCATION_TYPE.BLOCK, {x: 0, y:0})
-    puzzle.addElement(testElement);
+    let puzzle = new Puzzle(3, 5, {}, options);
+    puzzle.addElement(new Element(NODE_ELEMENT_TYPE.START, LOCATION_TYPE.NODE, {x: 0}));
+    puzzle.addElement(new Element(NODE_ELEMENT_TYPE.START, LOCATION_TYPE.NODE, {x: 2}));
 
     let theme = new Theme("#F9B700", "#3B280A", "#FFFFFF");
     let stage = document.getElementById("stage");
 
     Game.init(document.body, theme);
     Game.loadPuzzle(puzzle);
-
-
 }
