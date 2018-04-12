@@ -1,47 +1,38 @@
-class Movement {
-
-    constructor (direction)
-    {
-        this._direction = direction;
-        this._amount = 0;
-    }
-
-    increaseAmount(value) {
-        this._amount += value;  
-    }
-
-    decreaseAmount(value) {
-        this._amount -= value;
-    }
-}
-
-
 // Que comece a festa!!
 class Snake {
 
-    constructor (start)
-    {
+    constructor (start) {
         this._nodeStack = new Array();
         this._nodeStack.push(start);
-        //this._current
+        this._direction = DIRECTION.NONE;
+        this._movement = 0;
     }
 
-    forward (amount)
-    {
-
+    move (amount) {
+        this._movement += amount;
     }
 
-    backwards (amount)
-    {
-
-    }
-
-    pushNode ()
-    {
+    pushNode () {
 
     }
 
     get nodeStack () {
         return this._nodeStack;
+    }
+
+    get lastNode () {
+        return this._nodeStack[this._nodeStack.length - 1];
+    }
+
+    get movement () {
+        return this._movement;
+    }
+
+    get direction () {
+        return this._direction;
+    }
+
+    set direction (direction) {
+        this._direction = direction;
     }
 }

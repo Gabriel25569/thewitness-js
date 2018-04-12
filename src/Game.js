@@ -3,8 +3,7 @@ var Game = {
         let stage = document.createElement("div");
         let layers = new Array(2);
 
-        for (let i = 0; i < 2; i++)
-        {
+        for (let i = 0; i < 2; i++) {
             let layer = document.createElement("canvas");
             layer.style.zIndex = i;
             layer.style.position = "absolute";
@@ -51,8 +50,10 @@ var Game = {
         let y = e.clientY - Game._canvas.offsetTop;
 
         let startIndex = Game._puzzle.getStartNode(x, y);
-        if (startIndex != -1)
-        {
+        if (startIndex != -1) {
+            Game._x = x;
+            Game._y = y;
+
             Game._canvas.requestPointerLock();
             Game._snake = new Snake(startIndex);
 
@@ -64,8 +65,7 @@ var Game = {
     },
 
     _mouseExit: function (e) {
-        if (document.pointerLockElement != Game._canvas)
-        {
+        if (document.pointerLockElement != Game._canvas) {
             Game._snake = null;
             Game._graphics.clearSnake();
             Game._canvas.removeEventListener('mousemove', Game._mouseMove, false);
@@ -74,19 +74,33 @@ var Game = {
     },
 
     _mouseMove: function (e) {
-        var movementX = e.movementX || 0;
-        var movementY = e.movementY || 0;
+        let mx = e.movementX || 0;
+        let my = e.movementY || 0;
 
-        console.log(movementX + "; " + movementY);
-        
+        if (Game._snake.direction == DIRECTION.NONE) {
+            let lastNode = Game._snake.lastNode;
+            let ways = Game._puzzle.getNodeWays(lastNode);
+
+            if (Math.abs(mx) > Math.abs(my)) {
+                Game._snake.direction = DIRECTION.HORIZONTAL;
+
+                Game._snake.move(mx);
+                console.log("X");
+            } else {
+                Game._snake.direction = DIRECTION.VERTICAL;
+
+                Game._snake.move(my);
+                console.log("Y");
+
+            }
+        } else if (Game._snake.direction == DIRECTION.HORIZONTAL) {
+            Game._snake.move(mx);
+        } else {
+            Game._snake.move(my);
+
+        }
+
         Game._graphics.drawSnake(Game._snake);
-
-        // x += movementX;
-        // y += movementY;
-        //
-        // canvasDraw();
-        //
-        // Rectangle(x, y, 5, 5, {radius: [0, 0, 0, 0], width: 0}, {fill: "#FFFFFF" , stroke: "#FFFFFF"}, ctx);
     },
 
     _update: function () {

@@ -22,18 +22,15 @@ class Puzzle {
             this._blockElements[i] = new Array(columns);
 
 
-        for (let i = 0; i < elements.length; i++)
-        {
+        for (let i = 0; i < elements.length; i++) {
             this.addElement(elements[i]);
         }
     }
 
     // Add element to puzzle
-    addElement (element)
-    {
+    addElement (element) {
         let location = element.location;
-        switch (element.locationType)
-        {
+        switch (element.locationType) {
             case LOCATION_TYPE.NODE:
                 this._nodeElements[location.x] = element;
                 break;
@@ -57,7 +54,7 @@ class Puzzle {
         let x = margin + i % (this.columns + 1) * blockSize + i % (this.columns + 1) * pathSize + pathSize / 2;
         let y = margin + Math.floor(i / (this.columns + 1)) * blockSize + Math.floor(i / (this.columns + 1)) * pathSize + pathSize / 2;
 
-        return {x: x, y: y};
+        return {x: Math.floor(x), y: Math.floor(y)};
     }
 
     // Get start node index from coordinate (or -1 if not found)
@@ -86,6 +83,38 @@ class Puzzle {
 
         return -1;
     }
+
+    // Get node ways (TOP, RIGHT, BOTTOM, LEFT) from index
+    getNodeWays (i) {
+        let x = i % (this.columns + 1);
+        let y = Math.floor(i / (this.columns + 1));
+
+        let nodeWays = new Array();
+
+        if (x - 1 > 0)
+            nodeWays.push(NODE_WAY.LEFT);
+
+        if (y - 1 > 0)
+            nodeWays.push(NODE_WAY.TOP);
+
+        if (x + 1 < this.columns)
+            nodeWays.push(NODE_WAY.RIGHT);
+
+        if (y + 1 < this.rows)
+            nodeWays.push(NODE_WAY.BOTTOM);
+
+        return nodeWays;
+    }
+
+    // _iToXy (i) {
+    //     let x = i % (this.columns + 1);
+    //     let y = Math.floor(i / (this.columns + 1));
+    //     return {x: x, y: y};
+    // }
+    //
+    // _xyToI (x, y) {
+    //     return x * this._columns + y;
+    // }
 
     get rows () {
         return this._rows;

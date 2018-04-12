@@ -1,3 +1,16 @@
+const NODE_WAY = {
+    TOP: 0,
+    RIGHT: 1,
+    BOTTOM: 2,
+    LEFT: 3
+}
+
+const DIRECTION = {
+    NONE: -1,
+    HORIZONTAL: 0,
+    VERTICAL: 1
+}
+
 const LOCATION_TYPE = {
     NODE: 0,
     EDGE: 1,
@@ -20,14 +33,6 @@ const BLOCK_ELEMENT_TYPE = {
     SQUARE: 21,
     STAR: 22,
     CANCELATOR: 23
-}
-
-
-const DIRECTION = {
-    UP: 0,
-    RIGHT: 1,
-    DOWN: 2,
-    LEFT: 3
 }
 
 const COLOR = {

@@ -11,6 +11,8 @@ class Graphics {
     }
 
     setPuzzle (puzzle) {
+        this.clearSnake();
+
         let margin = puzzle.options.margin;
         let pathSize = puzzle.options.pathSize;
         let blockSize = puzzle.options.blockSize;
@@ -43,7 +45,7 @@ class Graphics {
 
         // Puzzle Background
         this._drawRectangle(margin, margin, width - 2 * margin, height - 2 * margin,
-                            {radius: [8, 8, 8, 8], width: 0},
+                            {radius: [pathSize / 2, pathSize / 2, pathSize / 2, pathSize / 2], width: 0},
                             {fill: this._theme.path , stroke: this._theme.path},
                             ctx
                            );
@@ -85,14 +87,52 @@ class Graphics {
 
     drawSnake (snake) {
         this.clearSnake();
-        let pathSize = this._puzzle.options.pathSize;
-        let ctx = this._snakeLayer.getContext("2d");
+        if (snake != null) {
+            let pathSize = this._puzzle.options.pathSize;
+            let ctx = this._snakeLayer.getContext("2d");
 
-        let coord = this._puzzle.getNodeCoordinate(snake.nodeStack[0]);
-        this._drawCircle(coord.x, coord.y, Math.floor(START_RADIUS * pathSize),
-                         this._theme.snake,
-                         ctx);
 
+            let c = this._puzzle.getNodeCoordinate(snake.nodeStack[0]);
+
+            this._drawCircle(c.x, c.y, Math.floor(START_RADIUS * pathSize),
+                             this._theme.snake,
+                             ctx);
+
+            let lastNode = snake.nodeStack[0];
+            let node = null;
+
+            // Initial offset to help user
+            let offset = 0;
+            if (snake.nodeStack.length == 1) {
+                offset = Math.floor(START_RADIUS * pathSize);
+            } else {
+                // Draw all the lines (except the last one)
+                for (let i = 1; i < snake.nodeStack.length; i++) {
+                    node = snake.nodeStack[i];
+
+                    let lastCoord = this._puzzle.getNodeCoordinate(lastNode);
+                    let coord = this._puzzle.getNodeCoordinate(node);
+
+                    this._drawLine(lastCoord.x, lastCoord.y, coord.x, coord.y, this._theme.snake, pathSize, ctx);
+
+                    lastNode = node;
+                }
+            }
+
+            // Draw the last line
+            if (snake.direction == DIRECTION.VERTICAL) {
+                if (snake.movement < 0) {
+                    offset = -offset;
+                }
+
+                this._drawLine(c.x, c.y, c.x, c.y + snake.movement + offset, this._theme.snake, pathSize, ctx);
+            } else if (snake.direction == DIRECTION.HORIZONTAL) {
+                if (snake.movement < 0) {
+                    offset = -offset;
+                }
+                this._drawLine(c.x, c.y, c.x + snake.movement + offset, c.y, this._theme.snake, pathSize, ctx);
+            }
+        }
     }
 
     clearSnake () {
@@ -146,6 +186,23 @@ class Graphics {
         ctx.fillStyle = fillStyle;
 
         ctx.fill();
+        ctx.fill();
+    }
+
+    _drawLine (x1, y1, x2, y2, style, width, ctx)
+    {
+        ctx.beginPath();
+        ctx.lineCap="round";
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.lineWidth = width;
+        ctx.strokeStyle = style;
+        ctx.stroke();
+        ctx.stroke();
+        ctx.stroke();
+        ctx.stroke();
+        ctx.stroke();
+
     }
 
     get width ()
