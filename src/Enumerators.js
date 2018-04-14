@@ -7,8 +7,10 @@ const NODE_WAY = {
 
 const DIRECTION = {
     NONE: -1,
-    HORIZONTAL: 0,
-    VERTICAL: 1
+    TOP: 0,
+    RIGHT: 1,
+    BOTTOM: 2,
+    LEFT: 3
 }
 
 const LOCATION_TYPE = {

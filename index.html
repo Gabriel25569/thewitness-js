@@ -3,12 +3,14 @@
     <meta charset="UTF-8">
     <title>Thanfor's Quest</title>
     <style>
+
         #game
         {
             position:absolute;
             border: 1px solid black;
             margin: 0 auto;
         }
+        
     </style>
 
     <!-- Scripts do jogo -->
@@ -19,6 +21,23 @@
     <script src="src/Puzzle.js"></script>
     <script src="src/Graphics.js"></script>
     <script src="src/Game.js"></script>
+
+    <script type="text/javascript">
+
+        window.onload = function main () {
+            let options = {blockSize: 100, margin: 50, pathSize: 25};
+            let puzzle = new Puzzle(3, 5, {}, options);
+            puzzle.addElement(new Element(NODE_ELEMENT_TYPE.START, LOCATION_TYPE.NODE, {x: 0}));
+            puzzle.addElement(new Element(NODE_ELEMENT_TYPE.START, LOCATION_TYPE.NODE, {x: 2}));
+
+            let theme = new Theme("#F9B700", "#3B280A", "#FFFFFF");
+            let stage = document.getElementById("stage");
+
+            Game.init(document.body, theme);
+            Game.loadPuzzle(puzzle);
+        }
+
+    </script>
 </head>
 <body>
     <p>Todo</p>

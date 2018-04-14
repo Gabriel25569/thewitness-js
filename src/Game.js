@@ -20,7 +20,7 @@ var Game = {
 
         Game._graphics = new Graphics(layers, theme);
         Game._currentPuzzle = null;
-
+        setInterval(Game._render, 1000/60)
         // function frame() {
         //     Game._now = Game._timestamp();
         //     Game._dt = Game._dt + Math.min(1, (Game._now - Game._last) / 1000);
@@ -51,14 +51,12 @@ var Game = {
 
         let startIndex = Game._puzzle.getStartNode(x, y);
         if (startIndex != -1) {
-            Game._x = x;
-            Game._y = y;
-
             Game._canvas.requestPointerLock();
             Game._snake = new Snake(startIndex);
 
             Game._canvas.addEventListener('mousemove', Game._mouseMove, false);
             document.addEventListener('pointerlockchange', Game._mouseExit, false);
+            Game._canvas.removeEventListener("click", Game._mouseClick, false);
 
             Game._graphics.drawSnake(Game._snake);
         }
@@ -67,40 +65,135 @@ var Game = {
     _mouseExit: function (e) {
         if (document.pointerLockElement != Game._canvas) {
             Game._snake = null;
+
             Game._graphics.clearSnake();
+
             Game._canvas.removeEventListener('mousemove', Game._mouseMove, false);
             document.removeEventListener('pointerlockchange', Game._mouseExit, false);
+            Game._canvas.addEventListener("click", Game._mouseClick, false);
         }
     },
 
     _mouseMove: function (e) {
-        let mx = e.movementX || 0;
-        let my = e.movementY || 0;
+        let mx = Math.floor(e.movementX) || 0;
+        let my = Math.floor(e.movementY) || 0;
+        let movement = 0;
+
+        let pathSize = Game._puzzle.options.pathSize;
+        let blockSize = Game._puzzle.options.blockSize;
+        let lineSize = pathSize + blockSize;
 
         if (Game._snake.direction == DIRECTION.NONE) {
-            let lastNode = Game._snake.lastNode;
-            let ways = Game._puzzle.getNodeWays(lastNode);
-
+            let direction;
+            let movement;
             if (Math.abs(mx) > Math.abs(my)) {
-                Game._snake.direction = DIRECTION.HORIZONTAL;
-
-                Game._snake.move(mx);
-                console.log("X");
+                if (mx > 0) {
+                    way = NODE_WAY.RIGHT;
+                    direction = DIRECTION.RIGHT;
+                } else {
+                    way = NODE_WAY.LEFT;
+                    direction = DIRECTION.LEFT;
+                }
+                movement = mx;
             } else {
-                Game._snake.direction = DIRECTION.VERTICAL;
-
-                Game._snake.move(my);
-                console.log("Y");
-
+                if (my > 0) {
+                    way = NODE_WAY.BOTTOM;
+                    direction = DIRECTION.BOTTOM;
+                } else {
+                    way = NODE_WAY.TOP;
+                    direction = DIRECTION.TOP;
+                }
+                movement = my;
             }
-        } else if (Game._snake.direction == DIRECTION.HORIZONTAL) {
-            Game._snake.move(mx);
+            
+            if ((direction == DIRECTION.TOP && Game._snake.lastDirection == DIRECTION.BOTTOM) || 
+                (direction == DIRECTION.RIGHT && Game._snake.lastDirection == DIRECTION.LEFT) ||
+                (direction == DIRECTION.BOTTOM && Game._snake.lastDirection == DIRECTION.TOP) ||
+                (direction == DIRECTION.LEFT && Game._snake.lastDirection == DIRECTION.RIGHT) &&
+                Game._snake.nodeStack.length != 1) {
+                    let last = Game._snake.popNode();
+    
+                    Game._nextNode = last.node;
+                    Game._snake.direction = last.direction;
+    
+                    if (Game._snake.direction == DIRECTION.BOTTOM || Game._snake.direction == DIRECTION.RIGHT) {
+                        Game._snake.movement = lineSize;
+                    } else {
+                        Game._snake.movement = -lineSize;
+                    }
+
+                    //Game._graphics.drawSnake(Game._snake);
+            } else if (Game._puzzle.getNodeWays(Game._snake.lastNode).includes(way)) {
+                Game._nextNode = Game._puzzle.getNodeNeighbor(Game._snake.lastNode, way);
+                Game._snake.direction = direction;
+            }
         } else {
-            Game._snake.move(my);
+            let movement;
+            if (Game._snake.direction == DIRECTION.RIGHT) {
+                if (Game._snake.movement < lineSize / 2) {
+                    movement = mx - Math.abs(my / 2);
+                } else {
+                    movement = mx + Math.abs(my / 2);
+                }
+            }
+            else if (Game._snake.direction == DIRECTION.LEFT) {
+                if (Math.abs(Game._snake.movement) < lineSize / 2) {
+                    movement = mx + Math.abs(my / 2);
+                } else {
+                    movement = mx - Math.abs(my / 2);
+                }
+            }
+            else if (Game._snake.direction == DIRECTION.BOTTOM) {
+                if (Game._snake.movement < lineSize / 2) {
+                    movement = my - Math.abs(mx / 2);
+                } else {
+                    movement = my + Math.abs(mx / 2);
+                }
+            }
+            else if (Game._snake.direction == DIRECTION.TOP) {
+                if (Math.abs(Game._snake.movement) < lineSize / 2) {
+                    movement = my + Math.abs(mx / 2);
+                } else {
+                    movement = my - Math.abs(mx / 2);
+                }
+            }
 
-        }
+            // Check if the snake is on the next node
+            if (Math.abs(Game._snake.movement + movement) > blockSize) {
+                if (Game._snake.nodeStack.includes(Game._nextNode) && Game._snake.lastNode != Game._nextNode) {
+                    if (Game._snake.direction == DIRECTION.BOTTOM || Game._snake.direction == DIRECTION.RIGHT) {
+                        Game._snake.movement = blockSize;
+                    } else {
+                        Game._snake.movement = -blockSize;
+                    }
+    
+                    //Game._graphics.drawSnake(Game._snake);
+                    return;
+                }
+            }
 
-        Game._graphics.drawSnake(Game._snake);
+            // Check if snake passed a node
+            if (Math.abs(Game._snake.movement + movement) > lineSize) {
+                Game._snake.pushNode(Game._nextNode);
+
+                Game._snake.movement = 0;
+                Game._snake.direction = DIRECTION.NONE;
+                
+                //Game._graphics.drawSnake(Game._snake);
+                return;
+            } 
+
+            // Check if snake is coming back
+            if (((Game._snake.direction == DIRECTION.BOTTOM || Game._snake.direction == DIRECTION.RIGHT) && Game._snake.movement + movement < 0) ||
+                ((Game._snake.direction == DIRECTION.TOP || Game._snake.direction == DIRECTION.LEFT) && Game._snake.movement + movement > 0)) {
+                Game._snake.direction = DIRECTION.NONE;
+                Game._snake.movement = 0;
+                //Game._graphics.drawSnake(Game._snake);
+                return;
+            } 
+            
+            Game._snake.move(movement);
+        } 
     },
 
     _update: function () {
@@ -108,19 +201,8 @@ var Game = {
     },
 
     _render: function () {
-
+        if (Game._snake != null) {
+            Game._graphics.drawSnake(Game._snake);
+        }
     },
-}
-
-window.onload = function main () {
-    let options = {blockSize: 100, margin: 50, pathSize: 25};
-    let puzzle = new Puzzle(3, 5, {}, options);
-    puzzle.addElement(new Element(NODE_ELEMENT_TYPE.START, LOCATION_TYPE.NODE, {x: 0}));
-    puzzle.addElement(new Element(NODE_ELEMENT_TYPE.START, LOCATION_TYPE.NODE, {x: 2}));
-
-    let theme = new Theme("#F9B700", "#3B280A", "#FFFFFF");
-    let stage = document.getElementById("stage");
-
-    Game.init(document.body, theme);
-    Game.loadPuzzle(puzzle);
 }

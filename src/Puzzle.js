@@ -45,7 +45,7 @@ class Puzzle {
         }
     }
 
-    // Get node position coordinate from index
+    // Get node screen coordinates from index
     getNodeCoordinate (i) {
         let margin = this._options.margin;
         let blockSize = this._options.blockSize;
@@ -55,6 +55,27 @@ class Puzzle {
         let y = margin + Math.floor(i / (this.columns + 1)) * blockSize + Math.floor(i / (this.columns + 1)) * pathSize + pathSize / 2;
 
         return {x: Math.floor(x), y: Math.floor(y)};
+    }
+
+    // Get node index based on screen coordinates (col)
+    getNode (x, y) {
+        let pathSize = this._options.pathSize;
+
+        for (let i = 0; i < this._nodeElements.length; i++) {
+            let nodeCoord = this.getNodeCoordinate(i);
+
+            let rx = nodeCoord.x - pathSize / 2;
+            let ry = nodeCoord.y - pathSize / 2;
+            let rw = pathSize;
+            let rh = pathSize;
+
+            // Collision with node "rectangle"
+            if (x >= rx && x <= rx + rw && y >= ry && y <= ry + rh) {   
+                return i;
+            }
+        }
+
+        return null;
     }
 
     // Get start node index from coordinate (or -1 if not found)
@@ -91,19 +112,42 @@ class Puzzle {
 
         let nodeWays = new Array();
 
-        if (x - 1 > 0)
+        if (x - 1 >= 0)
             nodeWays.push(NODE_WAY.LEFT);
 
-        if (y - 1 > 0)
+        if (y - 1 >= 0)
             nodeWays.push(NODE_WAY.TOP);
 
-        if (x + 1 < this.columns)
+        if (x + 1 <= this.columns)
             nodeWays.push(NODE_WAY.RIGHT);
 
-        if (y + 1 < this.rows)
+        if (y + 1 <= this.rows)
             nodeWays.push(NODE_WAY.BOTTOM);
 
         return nodeWays;
+    }
+
+    getNodeNeighbor (node, way) {
+        let ways = this.getNodeWays(node)
+
+        if (ways.includes(way)) {
+            switch (way) {
+                case NODE_WAY.TOP:
+                    return node - this.columns - 1;
+                    break;
+                case NODE_WAY.RIGHT:
+                    return node + 1;
+                    break;
+                case NODE_WAY.BOTTOM:
+                    return node + this.columns + 1;
+                    break;
+                case NODE_WAY.LEFT:
+                    return node - 1;
+                    break;
+            }
+        } else {
+            return null;
+        }
     }
 
     // _iToXy (i) {

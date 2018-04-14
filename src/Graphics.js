@@ -92,45 +92,32 @@ class Graphics {
             let ctx = this._snakeLayer.getContext("2d");
 
 
-            let c = this._puzzle.getNodeCoordinate(snake.nodeStack[0]);
+            let coord = this._puzzle.getNodeCoordinate(snake.nodeStack[0]);
 
-            this._drawCircle(c.x, c.y, Math.floor(START_RADIUS * pathSize),
+            this._drawCircle(coord.x, coord.y, Math.floor(START_RADIUS * pathSize),
                              this._theme.snake,
                              ctx);
 
             let lastNode = snake.nodeStack[0];
             let node = null;
 
-            // Initial offset to help user
-            let offset = 0;
-            if (snake.nodeStack.length == 1) {
-                offset = Math.floor(START_RADIUS * pathSize);
-            } else {
-                // Draw all the lines (except the last one)
-                for (let i = 1; i < snake.nodeStack.length; i++) {
-                    node = snake.nodeStack[i];
+            // Draw all the lines (except the last one)
+            for (let i = 1; i < snake.nodeStack.length; i++) {
+                node = snake.nodeStack[i];
 
-                    let lastCoord = this._puzzle.getNodeCoordinate(lastNode);
-                    let coord = this._puzzle.getNodeCoordinate(node);
+                let lastCoord = this._puzzle.getNodeCoordinate(lastNode);
+                coord = this._puzzle.getNodeCoordinate(node);
 
-                    this._drawLine(lastCoord.x, lastCoord.y, coord.x, coord.y, this._theme.snake, pathSize, ctx);
+                this._drawLine(lastCoord.x, lastCoord.y, coord.x, coord.y, this._theme.snake, pathSize, ctx);
 
-                    lastNode = node;
-                }
+                lastNode = node;
             }
 
             // Draw the last line
-            if (snake.direction == DIRECTION.VERTICAL) {
-                if (snake.movement < 0) {
-                    offset = -offset;
-                }
-
-                this._drawLine(c.x, c.y, c.x, c.y + snake.movement + offset, this._theme.snake, pathSize, ctx);
-            } else if (snake.direction == DIRECTION.HORIZONTAL) {
-                if (snake.movement < 0) {
-                    offset = -offset;
-                }
-                this._drawLine(c.x, c.y, c.x + snake.movement + offset, c.y, this._theme.snake, pathSize, ctx);
+            if (snake.direction == DIRECTION.TOP || snake.direction == DIRECTION.BOTTOM) {
+                this._drawLine(coord.x, coord.y, coord.x, coord.y + snake.movement, this._theme.snake, pathSize, ctx);
+            } else if (snake.direction == DIRECTION.LEFT || snake.direction == DIRECTION.RIGHT) {
+                this._drawLine(coord.x, coord.y, coord.x + snake.movement, coord.y, this._theme.snake, pathSize, ctx);
             }
         }
     }
