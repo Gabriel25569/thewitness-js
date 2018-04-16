@@ -14,21 +14,23 @@
     </style>
 
     <!-- Scripts do jogo -->
-    <script src="src/Snake.js"></script>
-    <script src="src/Enumerators.js"></script>
-    <script src="src/Element.js"></script>
-    <script src="src/Theme.js"></script>
-    <script src="src/Puzzle.js"></script>
-    <script src="src/Graphics.js"></script>
-    <script src="src/Game.js"></script>
+    <script src="src/stats.min.js"></script>
+    <script src="src/snake.js"></script>
+    <script src="src/enumerators.js"></script>
+    <script src="src/element.js"></script>
+    <script src="src/theme.js"></script>
+    <script src="src/puzzle.js"></script>
+    <script src="src/graphics.js"></script>
+    <script src="src/game.js"></script>
 
     <script type="text/javascript">
-
         window.onload = function main () {
             let options = {blockSize: 100, margin: 50, pathSize: 25};
-            let puzzle = new Puzzle(3, 5, {}, options);
-            puzzle.addElement(new Element(NODE_ELEMENT_TYPE.START, LOCATION_TYPE.NODE, {x: 0}));
-            puzzle.addElement(new Element(NODE_ELEMENT_TYPE.START, LOCATION_TYPE.NODE, {x: 2}));
+
+            let puzzle = new Puzzle(4, 4, {}, options);
+
+            puzzle.addElement(new Element(NODE_ELEMENT_TYPE.START, LOCATION_TYPE.NODE, {x: 10}));
+            puzzle.addElement(new Element(NODE_ELEMENT_TYPE.START, LOCATION_TYPE.NODE, {x: 18}));
 
             let theme = new Theme("#F9B700", "#3B280A", "#FFFFFF");
             let stage = document.getElementById("stage");
