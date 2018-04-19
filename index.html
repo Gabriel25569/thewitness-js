@@ -2,16 +2,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Thanfor's Quest</title>
-    <style>
-
-        #game
-        {
-            position:absolute;
-            border: 1px solid black;
-            margin: 0 auto;
-        }
-        
-    </style>
+    <link href="style.css" rel="stylesheet" type="text/css">
 
     <!-- Scripts do jogo -->
     <script src="src/stats.min.js"></script>
@@ -31,6 +22,8 @@
 
             puzzle.addElement(new Element(NODE_ELEMENT_TYPE.START, LOCATION_TYPE.NODE, {x: 10}));
             puzzle.addElement(new Element(NODE_ELEMENT_TYPE.START, LOCATION_TYPE.NODE, {x: 18}));
+            puzzle.addElement(new Element(EDGE_ELEMENT_TYPE.HEXAGON, LOCATION_TYPE.EDGE, {x: 0, y: 1}));
+            puzzle.addElement(new Element(EDGE_ELEMENT_TYPE.HEXAGON, LOCATION_TYPE.EDGE, {x: 0, y: 5}));
 
             let theme = new Theme("#F9B700", "#3B280A", "#FFFFFF");
             let stage = document.getElementById("stage");
@@ -42,11 +35,10 @@
     </script>
 </head>
 <body>
-    <p>Todo</p>
+    <p><b>To-do</b></p>
     <ul>
-        <li>Draw elements</li>
-        <li>Snake</li>
-        <li>Verification</li>
+        <li>Elementos</li>
+        <li>Verificação</li>
     </ul>
     <br>
 </body>

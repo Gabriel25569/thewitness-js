@@ -57,6 +57,30 @@ class Puzzle {
         return {x: Math.floor(x), y: Math.floor(y)};
     }
 
+
+    getEdgeCoordinate (i1, i2) {
+        let blockSize = this._options.blockSize;
+        let pathSize = this._options.pathSize;
+
+        let coord1 = this.getNodeCoordinate(i1);
+        let coord2 = this.getNodeCoordinate(i2);
+        
+        let x;
+        let y;
+
+        if (coord1.x == coord2.x) {
+            x = coord1.x;
+            y = Math.max(coord1.y, coord2.y) - Math.floor((blockSize + pathSize) / 2);
+        } else if (coord1.y == coord2.y) {
+            x = Math.max(coord1.x, coord2.x) - Math.floor((blockSize + pathSize) / 2);
+            y = coord1.y;
+        } else {
+            return null;
+        }
+
+        return {x: x, y: y};
+    }
+
     // Get node index based on screen coordinates (col)
     getNode (x, y) {
         let pathSize = this._options.pathSize;
@@ -105,7 +129,7 @@ class Puzzle {
         return -1;
     }
 
-    // Get node ways (TOP, RIGHT, BOTTOM, LEFT) from index
+    // Get node possible ways (TOP, RIGHT, BOTTOM, LEFT) from node index
     getNodeWays (i) {
         let x = i % (this.columns + 1);
         let y = Math.floor(i / (this.columns + 1));
@@ -113,35 +137,36 @@ class Puzzle {
         let nodeWays = new Array();
 
         if (x - 1 >= 0)
-            nodeWays.push(NODE_WAY.LEFT);
+            nodeWays.push(DIRECTION.LEFT);
 
         if (y - 1 >= 0)
-            nodeWays.push(NODE_WAY.TOP);
+            nodeWays.push(DIRECTION.TOP);
 
         if (x + 1 <= this.columns)
-            nodeWays.push(NODE_WAY.RIGHT);
+            nodeWays.push(DIRECTION.RIGHT);
 
         if (y + 1 <= this.rows)
-            nodeWays.push(NODE_WAY.BOTTOM);
+            nodeWays.push(DIRECTION.BOTTOM);
 
         return nodeWays;
     }
 
-    getNodeNeighbor (node, way) {
+    // 
+    getNodeNeighbor (node, direction) {
         let ways = this.getNodeWays(node)
 
-        if (ways.includes(way)) {
-            switch (way) {
-                case NODE_WAY.TOP:
+        if (ways.includes(direction)) {
+            switch (direction) {
+                case DIRECTION.TOP:
                     return node - this.columns - 1;
                     break;
-                case NODE_WAY.RIGHT:
+                case DIRECTION.RIGHT:
                     return node + 1;
                     break;
-                case NODE_WAY.BOTTOM:
+                case DIRECTION.BOTTOM:
                     return node + this.columns + 1;
                     break;
-                case NODE_WAY.LEFT:
+                case DIRECTION.LEFT:
                     return node - 1;
                     break;
             }
@@ -149,16 +174,6 @@ class Puzzle {
             return null;
         }
     }
-
-    // _iToXy (i) {
-    //     let x = i % (this.columns + 1);
-    //     let y = Math.floor(i / (this.columns + 1));
-    //     return {x: x, y: y};
-    // }
-    //
-    // _xyToI (x, y) {
-    //     return x * this._columns + y;
-    // }
 
     get rows () {
         return this._rows;

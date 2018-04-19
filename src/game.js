@@ -79,22 +79,18 @@ var Game = {
 
         if (Game._snake.direction == DIRECTION.NONE) {
             let direction;
-            let movement;
+
             if (Math.abs(mx) > Math.abs(my)) {
                 if (mx > 0) {
-                    way = NODE_WAY.RIGHT;
                     direction = DIRECTION.RIGHT;
                 } else {
-                    way = NODE_WAY.LEFT;
                     direction = DIRECTION.LEFT;
                 }
                 movement = mx;
             } else {
                 if (my > 0) {
-                    way = NODE_WAY.BOTTOM;
                     direction = DIRECTION.BOTTOM;
                 } else {
-                    way = NODE_WAY.TOP;
                     direction = DIRECTION.TOP;
                 }
                 movement = my;
@@ -116,7 +112,7 @@ var Game = {
                         Game._snake.movement = -lineSize;
                     }
             } else {
-                let node = Game._puzzle.getNodeNeighbor(Game._snake.lastNode, way)
+                let node = Game._puzzle.getNodeNeighbor(Game._snake.lastNode, direction)
                 if (node != null) {
                     Game._nextNode = node;
                     Game._snake.direction = direction;

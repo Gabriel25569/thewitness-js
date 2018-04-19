@@ -13,6 +13,8 @@ class Graphics {
     setPuzzle (puzzle) {
         this.clearSnake();
 
+        this._puzzle = puzzle;
+
         let margin = puzzle.options.margin;
         let pathSize = puzzle.options.pathSize;
         let blockSize = puzzle.options.blockSize;
@@ -21,8 +23,6 @@ class Graphics {
 
         let width = 2 * margin + columns * blockSize + ((columns + 1) * pathSize);
         let height = 2 * margin + rows * blockSize + ((rows + 1) * pathSize);
-
-        this._puzzle = puzzle;
 
         this._width = width;
         this._height = height;
@@ -61,9 +61,10 @@ class Graphics {
                                     {fill: this._theme.background , stroke: this._theme.background},
                                     ctx
                                    );
+
                 //if (puzzle.blocks[i][j] != null)
                 //{
-                    // Draw block elements
+                     //Draw block elements
                 //}
             }
         }
@@ -82,7 +83,19 @@ class Graphics {
             }
         }
 
-        // Draw node and edge elements
+        // Edges
+        for (let i = 0; i < puzzle.edgeElements.length; i++) {
+            for (let j = 0; j < puzzle.edgeElements[0].length; j++) {
+                if (i < j && puzzle.edgeElements[i][j] != null) {
+                    switch (puzzle.edgeElements[i][j].type) {
+                        case EDGE_ELEMENT_TYPE.HEXAGON:
+                            let coord = puzzle.getEdgeCoordinate(i, j);
+                            this._drawHexagon(coord.x, coord.y, 10, "#888888", ctx)
+                            break;
+                    }
+                }
+            }
+        }
     }
 
     drawSnake (snake) {
@@ -176,8 +189,35 @@ class Graphics {
 
         ctx.fillStyle = fillStyle;
 
+        // Aqui é gambiarra mesmo
         ctx.fill();
         ctx.fill();
+    }
+
+    _drawHexagon (x, y, r, fillStyle, ctx) {
+        let sr = r / 2;
+
+        let h  = r * Math.sqrt(3) / 2;
+        ctx.beginPath();
+
+
+        ctx.moveTo(x - r, y);
+        ctx.lineTo(x - sr, y + h);
+        ctx.lineTo(x + sr, y + h);
+        ctx.lineTo(x + r, y);
+        ctx.lineTo(x + sr, y - h);
+        ctx.lineTo(x - sr, y - h);
+        ctx.lineTo(x - r, y);
+
+        ctx.closePath();
+        
+        ctx.fillStyle = fillStyle;
+        ctx.fill();
+
+        // Aqui é gambiarra mesmo
+        ctx.fill();
+        ctx.fill();
+
     }
 
     _drawLine (x1, y1, x2, y2, style, width, ctx)
@@ -188,7 +228,8 @@ class Graphics {
         ctx.lineTo(x2, y2);
         ctx.lineWidth = width;
         ctx.strokeStyle = style;
-        ctx.stroke();
+
+        // Aqui é gambiarra mesmo
         ctx.stroke();
         ctx.stroke();
 
