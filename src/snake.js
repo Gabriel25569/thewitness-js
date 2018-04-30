@@ -1,10 +1,11 @@
-// Que comece a festa!!
 class Snake {
 
     constructor (start) {
         this._nodeStack = new Array();
-        this._nodeStack.push(start);
         this._directions = new Array();
+
+        this._nodeStack.push(start);
+
         this._direction = DIRECTION.NONE;
         this._movement = 0;
     }
@@ -22,10 +23,6 @@ class Snake {
         let node = this._nodeStack.pop();
         let direction = this._directions.pop();
         return {node: node, direction: direction};
-    }
-
-    resetMovement () {
-        this._movement = 0;
     }
 
     get nodeStack () {
