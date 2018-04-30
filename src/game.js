@@ -13,12 +13,6 @@ var Game = {
 
         parent.appendChild(stage);
 
-        // JS STATS //////////////////////////////////////////////
-        Game._stats = new Stats();                              //
-        Game._stats.showPanel(0);                               //
-        parent.appendChild(Game._stats.dom);                    //
-        //////////////////////////////////////////////////////////
-
         Game._stage = stage;
 
         Game._canvas = layers[1];
@@ -26,6 +20,14 @@ var Game = {
 
         Game._graphics = new Graphics(layers, theme);
         Game._currentPuzzle = null;
+
+
+        // JS STATS ///////////////////////////
+        Game._stats = new Stats();           //
+        Game._stats.showPanel(0);            //
+        parent.appendChild(Game._stats.dom); //
+        ///////////////////////////////////////
+
         requestAnimationFrame(Game._render);
     },
 
@@ -72,11 +74,11 @@ var Game = {
         let mx = Math.floor(e.movementX) || 0;
         let my = Math.floor(e.movementY) || 0;
         let movement = 0;
-
+        
         let pathSize = Game._puzzle.options.pathSize;
         let blockSize = Game._puzzle.options.blockSize;
         let lineSize = pathSize + blockSize;
-
+        
         if (Game._snake.direction == DIRECTION.NONE) {
             let direction;
 
@@ -112,7 +114,7 @@ var Game = {
                         Game._snake.movement = -lineSize;
                     }
             } else {
-                let node = Game._puzzle.getNodeNeighbor(Game._snake.lastNode, direction)
+                let node = Game._puzzle.getNodeNeighbor(Game._snake.lastNode, direction);
                 if (node != null) {
                     Game._nextNode = node;
                     Game._snake.direction = direction;
@@ -188,12 +190,9 @@ var Game = {
             
             Game._snake.move(movement);
         } 
-    },
-
-    _update: function () {
 
     },
-
+    
     _render: function () {
         Game._stats.begin();
 
