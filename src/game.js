@@ -33,6 +33,7 @@ var Game = {
 
     loadPuzzle : function (puzzle) {
         Game._graphics.setPuzzle(puzzle);
+        Game._graphics.drawPuzzle();
         Game._puzzle = puzzle;
         Game._snake = null;
 
@@ -44,16 +45,19 @@ var Game = {
         let x = e.clientX - Game._canvas.offsetLeft;
         let y = e.clientY - Game._canvas.offsetTop;
 
-        let startIndex = Game._puzzle.getStartNode(x, y);
-        if (startIndex != -1) {
-            Game._canvas.requestPointerLock();
-            Game._snake = new Snake(startIndex);
-
-            Game._canvas.addEventListener('mousemove', Game._mouseMove, false);
-            document.addEventListener('pointerlockchange', Game._mouseExit, false);
-            Game._canvas.removeEventListener("click", Game._mouseClick, false);
-
-            Game._graphics.drawSnake(Game._snake);
+        for (let i = 0; i < Game._puzzle.nodes.length; i++) {
+            let rect = Game._puzzle.nodes[i].rect;
+            if (x >= rect.x && x <= rect.x + rect.w && y >= rect.y && y <= rect.y + rect.h &&
+                Game._puzzle.nodes[i].element == NODE_ELEMENT_TYPE.START) {   
+                    Game._canvas.requestPointerLock();
+                    Game._snake = new Snake(i);
+        
+                    Game._canvas.addEventListener("mousemove", Game._mouseMove, false);
+                    document.addEventListener("pointerlockchange", Game._mouseExit, false);
+                    Game._canvas.removeEventListener("click", Game._mouseClick, false);
+        
+                    Game._graphics.drawSnake(Game._snake);
+            }
         }
     },
 
@@ -61,11 +65,8 @@ var Game = {
         if (document.pointerLockElement != Game._canvas) {
             Game._snake = null;
 
-            Game._graphics.clearSnake();
-
-            Game._lastMove = Date.now();
-            Game._canvas.removeEventListener('mousemove', Game._mouseMove, false);
-            document.removeEventListener('pointerlockchange', Game._mouseExit, false);
+            Game._canvas.removeEventListener("mousemove", Game._mouseMove, false);
+            document.removeEventListener("pointerlockchange", Game._mouseExit, false);
             Game._canvas.addEventListener("click", Game._mouseClick, false);
         }
     },
@@ -204,4 +205,4 @@ var Game = {
         
         requestAnimationFrame(Game._render);
     },
-}
+};

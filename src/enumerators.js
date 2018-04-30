@@ -6,11 +6,11 @@ const DIRECTION = {
     LEFT: 3
 }
 
-const LOCATION_TYPE = {
-    NODE: 0,
-    EDGE: 1,
-    BLOCK: 2
-}
+// const LOCATION_TYPE = {
+//     NODE: 0,
+//     EDGE: 1,
+//     BLOCK: 2
+// }
 
 const NODE_ELEMENT_TYPE = {
     START: 0,
@@ -19,8 +19,7 @@ const NODE_ELEMENT_TYPE = {
 }
 
 const EDGE_ELEMENT_TYPE = {
-    EDGE_HALF_BREAK: 10,
-    EDGE_FULL_BREAK: 11,
+    EDGE_BREAK: 10,
     HEXAGON: 20,
 }
 
@@ -42,3 +41,4 @@ const BLOCK_ELEMENT_TYPE = {
 // }
 
 const START_RADIUS = 5 / 4;
+const END_SIZE = 1 / 3;

@@ -1,27 +1,14 @@
-class Element {
+// class Element {
 
-    constructor(type, locationType, location) {
-        this._type = type;
-        this._locationType = locationType;
-        this._location = location;
-    }
+//     constructor(type) {
+//         this._type = type;
+//     }
 
-    get type ()
-    {
-        return this._type;
-    }
+//     get type () {
+//         return this._type;
+//     }
+// }
 
-    get locationType ()
-    {
-        return this._locationType;
-    }
-
-    get location ()
-    {
-        return this._location;
-    }
-
-}
 
 // class Location {
 

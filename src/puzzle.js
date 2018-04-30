@@ -1,201 +1,250 @@
+class Node {
+    
+    constructor (i, x, y, rect) {
+        this._i = i;
+        this.x = x;
+        this.y = y;
+        this.rect = rect;
+        this._neighbors = new Array(4);
+    }
+
+    set x (x) {
+        this._x = x;
+    }
+
+    set y (y) {
+        this._y = y;
+    }
+
+    set rect (rect) {
+        this._rect = rect;
+    }
+
+    set element (element) {
+        this._element = element;
+    }
+
+    get i () {
+        return this._i;
+    }
+
+    get x () {
+        return this._x;
+    }
+
+    get y () {
+        return this._y;
+    }
+
+    get rect () {
+        return this._rect;
+    }
+
+    get element () {
+        return this._element;
+    }
+
+    get neighbors () {
+        return this._neighbors;
+    }
+}
+
+class Edge {
+
+    constructor (i1, i2, x, y) {
+        this._i1 = i1;
+        this._i2 = i2;
+        this.x = x;
+        this.y = y;
+    }
+    
+    set x (x) {
+        this._x = x;
+    }
+
+    set y (y) {
+        this._y = y;
+    }
+
+    set element (element) {
+        this._element = element;
+    }
+
+    get i1 () {
+        return this._i1;
+    }
+
+    get i2 () {
+        return this._i2;
+    }
+
+    get x () {
+        return this._x;
+    }
+
+    get y () {
+        return this._y;
+    }
+
+    get element () {
+        return this._element;
+    }
+}
+
+class Block {
+
+}
+
+
 class Puzzle {
 
-    constructor (rows, columns, elements, options) {
-        if (rows < 1)
-            throw "Invalid value for puzzle rows";
-
-        if (columns < 1)
-            throw "Invalid value for puzzle columns";
-
-        this._rows = rows;
-        this._columns = columns;
+    constructor (options) {
         this._options = options;
 
-        this._nodeElements = new Array(rows * columns);
+        let nodeCount = (this._options.rows + 1) * (this._options.columns + 1);
 
-        this._edgeElements = new Array(rows * columns);
-        for (let i = 0; i < rows * columns; i++)
-            this._edgeElements[i] = new Array(rows * columns);
+        this._nodes = new Array(nodeCount);
+        for (let i = 0; i < nodeCount; i++) {
+            this._nodes[i] = new Node(
+                i,
+                this._getNodeXCoordinate(i),
+                this._getNodeYCoordinate(i),
+                this._getNodeRectangle(i)
+            )
+            
+            // Add node neighbors
+            let x = i % (this._options.columns + 1);
+            let y = Math.floor(i / (this._options.columns + 1));
 
-        this._blockElements = new Array(rows);
-        for (let i = 0; i < rows; i++)
-            this._blockElements[i] = new Array(columns);
+            if (y - 1 >= 0)
+                this._nodes[i].neighbors[DIRECTION.TOP] = i - this._options.columns + 1;
 
+            if (x + 1 <= this._options.columns)
+                this._nodes[i].neighbors[DIRECTION.RIGHT] = i + 1;
 
-        for (let i = 0; i < elements.length; i++) {
-            this.addElement(elements[i]);
+            if (y + 1 <= this._options.rows)
+                this._nodes[i].neighbors[DIRECTION.BOTTOM] = i + this._options.columns + 1;
+
+            if (x - 1 >= 0)
+                this._nodes[i].neighbors[DIRECTION.LEFT] = i - 1;
         }
-    }
 
-    // Add element to puzzle
-    addElement (element) {
-        let location = element.location;
-        switch (element.locationType) {
-            case LOCATION_TYPE.NODE:
-                this._nodeElements[location.x] = element;
-                break;
-            case LOCATION_TYPE.EDGE:
-                this._edgeElements[location.x][location.y] = element;
-                this._edgeElements[location.y][location.x] = element;
-            case LOCATION_TYPE.BLOCK:
-                this._blockElements[location.x][location.y] = element;
-                break;
-            default:
-                throw "Puzzle with invalid element location type";
+        this._edges = new Array();
+        for (let i = 0; i < nodeCount; i++) {
+            if (i % this._options.rows + 1 < this._options.rows) {
+                this._edges.push(new Edge(
+                    i, i + 1,
+                    this._getEdgeXCoordinate(i, i + 1),
+                    this._getEdgeYCoordinate(i, i + 1),
+                ));
+            }
+
+            if (i + this._options.rows + 1 < nodeCount + 1) {
+                this._edges.push(new Edge(
+                    i, i + this._options.rows + 1,
+                    this._getEdgeXCoordinate(i, i + this._options.rows + 1),
+                    this._getEdgeYCoordinate(i, i + this._options.rows + 1),
+                ));
+            }
         }
+
+        this._blocks = new Array();
     }
 
-    // Get node screen coordinates from index
-    getNodeCoordinate (i) {
-        let margin = this._options.margin;
-        let blockSize = this._options.blockSize;
-        let pathSize = this._options.pathSize;
-
-        let x = margin + i % (this.columns + 1) * blockSize + i % (this.columns + 1) * pathSize + pathSize / 2;
-        let y = margin + Math.floor(i / (this.columns + 1)) * blockSize + Math.floor(i / (this.columns + 1)) * pathSize + pathSize / 2;
-
-        return {x: Math.floor(x), y: Math.floor(y)};
+    addNodeElement (element, location) {
+        this._nodes[location].element = element;
     }
 
+    addEdgeElement (element, startNodeLocation, endNodeLocation) {
+        this._edges.find((e) => {
+            return e.i1 == startNodeLocation && 
+                   e.i2 == endNodeLocation
+        }).element = element;
+    }
 
-    getEdgeCoordinate (i1, i2) {
-        let blockSize = this._options.blockSize;
-        let pathSize = this._options.pathSize;
+    addBlockElement (element, location) {
+        // ...
+    }
+    
+    _getNodeXCoordinate (i) { 
+        return this._options.margin + 
+               i % (this._options.columns + 1) * this._options.blockSize + 
+               this._options.pathSize * (i % (this._options.columns + 1) + 0.5);
+        }
+    
+    _getNodeYCoordinate (i) { 
+        return this._options.margin + 
+               Math.floor(i / (this._options.columns + 1)) * this._options.blockSize + 
+               this._options.pathSize * (Math.floor(i / (this._options.columns + 1)) + 0.5);
+    }
 
-        let coord1 = this.getNodeCoordinate(i1);
-        let coord2 = this.getNodeCoordinate(i2);
-        
-        let x;
-        let y;
+    _getNodeCoordinate (i) {
+        return {
+            x: this._getNodeXCoordinate(i), 
+            y: this._getNodeYCoordinate(i)
+        };
+    }
+
+    _getNodeRectangle (i) {
+        let coord = this._getNodeCoordinate(i);
+        return {
+            x: coord.x - this._options.pathSize / 2,
+            y: coord.y - this._options.pathSize / 2,
+            w: this._options.pathSize,
+            h: this._options.pathSize
+        };
+    }
+
+    _getEdgeXCoordinate (i1, i2) {
+        let coord1 = this._getNodeCoordinate(i1);
+        let coord2 = this._getNodeCoordinate(i2);
 
         if (coord1.x == coord2.x) {
-            x = coord1.x;
-            y = Math.max(coord1.y, coord2.y) - Math.floor((blockSize + pathSize) / 2);
-        } else if (coord1.y == coord2.y) {
-            x = Math.max(coord1.x, coord2.x) - Math.floor((blockSize + pathSize) / 2);
-            y = coord1.y;
+            return coord1.x;
         } else {
-            return null;
+            return Math.max(coord1.x, coord2.x) - Math.floor((this._options.blockSize + this._options.pathSize) / 2);
         }
-
-        return {x: x, y: y};
     }
 
-    // Get node index based on screen coordinates (col)
-    getNode (x, y) {
-        let pathSize = this._options.pathSize;
+    _getEdgeYCoordinate (i1, i2) {
+        let coord1 = this._getNodeCoordinate(i1);
+        let coord2 = this._getNodeCoordinate(i2);
 
-        for (let i = 0; i < this._nodeElements.length; i++) {
-            let nodeCoord = this.getNodeCoordinate(i);
-
-            let rx = nodeCoord.x - pathSize / 2;
-            let ry = nodeCoord.y - pathSize / 2;
-            let rw = pathSize;
-            let rh = pathSize;
-
-            // Collision with node "rectangle"
-            if (x >= rx && x <= rx + rw && y >= ry && y <= ry + rh) {   
-                return i;
-            }
-        }
-
-        return null;
-    }
-
-    // Get start node index from coordinate (or -1 if not found)
-    getStartNode (x, y) {
-        let startNodes = new Array();
-        for (let i = 0; i < this._nodeElements.length; i++) {
-            if (this._nodeElements[i] != null && this._nodeElements[i].type == NODE_ELEMENT_TYPE.START) {
-                startNodes.push(i);
-            }
-        }
-
-        for (let i = 0; i < startNodes.length; i++) {
-            let coord = this.getNodeCoordinate(startNodes[i]);
-
-            let cx = coord.x;
-            let cy = coord.y;
-
-            let dx = x - cx;
-            let dy = y - cy;
-            let d = Math.sqrt((dx * dx) + (dy * dy));
-
-            if (d <= Math.floor(START_RADIUS * this._options.pathSize)) {
-                return startNodes[i];
-            }
-        }
-
-        return -1;
-    }
-
-    // Get node possible ways (TOP, RIGHT, BOTTOM, LEFT) from node index
-    getNodeWays (i) {
-        let x = i % (this.columns + 1);
-        let y = Math.floor(i / (this.columns + 1));
-
-        let nodeWays = new Array();
-
-        if (x - 1 >= 0)
-            nodeWays.push(DIRECTION.LEFT);
-
-        if (y - 1 >= 0)
-            nodeWays.push(DIRECTION.TOP);
-
-        if (x + 1 <= this.columns)
-            nodeWays.push(DIRECTION.RIGHT);
-
-        if (y + 1 <= this.rows)
-            nodeWays.push(DIRECTION.BOTTOM);
-
-        return nodeWays;
-    }
-
-    // 
-    getNodeNeighbor (node, direction) {
-        let ways = this.getNodeWays(node)
-
-        if (ways.includes(direction)) {
-            switch (direction) {
-                case DIRECTION.TOP:
-                    return node - this.columns - 1;
-                    break;
-                case DIRECTION.RIGHT:
-                    return node + 1;
-                    break;
-                case DIRECTION.BOTTOM:
-                    return node + this.columns + 1;
-                    break;
-                case DIRECTION.LEFT:
-                    return node - 1;
-                    break;
-            }
+        if (coord1.y == coord2.y) {
+            return coord1.y;
         } else {
-            return null;
+            return Math.max(coord1.y, coord2.y) - Math.floor((this._options.blockSize + this._options.pathSize) / 2);
         }
+    }
+
+    _getEdgeCoordinate (i1, i2) {
+        return {
+            x: this._getEdgeXCoordinate(i1, i2), 
+            y: this._getEdgeYCoordinate(i1, i2)
+        };
     }
 
     get rows () {
-        return this._rows;
+        return this._options.rows;
     }
 
     get columns () {
-        return this._columns;
+        return this._options.columns;
     }
 
     get options () {
         return this._options;
     }
 
-    get nodeElements () {
-        return this._nodeElements;
+    get nodes () {
+        return this._nodes;
     }
 
-    get edgeElements () {
-        return this._edgeElements;
+    get edges () {
+        return this._edges;
     }
 
-    get blockElements () {
-        return this._blockElements
+    get blocks () {
+        return this._blocks;
     }
 }

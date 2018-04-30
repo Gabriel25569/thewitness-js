@@ -16,14 +16,18 @@
 
     <script type="text/javascript">
         window.onload = function main () {
-            let options = {blockSize: 100, margin: 50, pathSize: 25};
+            let options = {blockSize: 100, margin: 50, pathSize: 25, rows: 4, columns: 4};
 
-            let puzzle = new Puzzle(4, 4, {}, options);
+            let puzzle = new Puzzle(options);
 
-            puzzle.addElement(new Element(NODE_ELEMENT_TYPE.START, LOCATION_TYPE.NODE, {x: 10}));
-            puzzle.addElement(new Element(NODE_ELEMENT_TYPE.START, LOCATION_TYPE.NODE, {x: 18}));
-            puzzle.addElement(new Element(EDGE_ELEMENT_TYPE.HEXAGON, LOCATION_TYPE.EDGE, {x: 0, y: 1}));
-            puzzle.addElement(new Element(EDGE_ELEMENT_TYPE.HEXAGON, LOCATION_TYPE.EDGE, {x: 0, y: 5}));
+            puzzle.addNodeElement(NODE_ELEMENT_TYPE.START, 9);
+            puzzle.addNodeElement(NODE_ELEMENT_TYPE.HEXAGON, 11);
+            puzzle.addEdgeElement(EDGE_ELEMENT_TYPE.HEXAGON, 0, 1)
+            // puzzle.addElement(new Element(EDGE_ELEMENT_TYPE.END, LOCATION_TYPE.EDGE, {x: 0, y: 5}));
+            // puzzle.addElement(new Element(NODE_ELEMENT_TYPE.START, LOCATION_TYPE.NODE, {x: 18}));
+            // puzzle.addElement(new Element(EDGE_ELEMENT_TYPE.HEXAGON, LOCATION_TYPE.EDGE, {x: 0, y: 1}));
+            // puzzle.addElement(new Element(EDGE_ELEMENT_TYPE.HEXAGON, LOCATION_TYPE.EDGE, {x: 0, y: 5}));
+
 
             let theme = new Theme("#F9B700", "#3B280A", "#FFFFFF");
             let stage = document.getElementById("stage");
