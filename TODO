@@ -1,21 +1,23 @@
 Todo:
     Snake:
-        ☐ Optimize snake movement on `Game._mouseMove()` @high 
+        ☐ Optimize snake movement at `Game._mouseMove()` @high 
+        ☐ Optimize snake code at `Graphics.drawSnake()` @critical
         ☐ Draw snake at end node
 
     Graphics:
+        ✔ Add support for node `HEXAGON` drawing @done(18-04-29 13:13)
         ☐ Add support for node `END` drawing
         ☐ Add support for edge `EDGE_HALF_BREAK` drawing
-        ✔ Add support for node `HEXAGON` drawing @done(18-04-29 13:13)
         ☐ Add support for block `SQUARE` drawing
         ☐ Add support for block `STAR` drawing
         ☐ Add support for block `CANCELATOR` drawing
         ☐ Add support for colors
     
     Puzzle:
+        ✔ Find better names for WAYS / DIRECTION system @done(18-04-29 22:19)
         ☐ Puzzle validation
         ☐ Puzzle editing UI
-        ☐ Find better names for WAYS / DIRECTION system
+        ☐ Add support for elements with properties (example: tetris, black and white)
 
     Theme:
         ☐ Add more options
