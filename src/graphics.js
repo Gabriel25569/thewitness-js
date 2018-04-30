@@ -12,6 +12,9 @@ class Graphics {
     }
 
     setPuzzle (puzzle) {
+        // Store puzzle
+        this._puzzle = puzzle;
+
         // Store puzzle options
         this._margin = puzzle.options.margin;
         this._pathSize = puzzle.options.pathSize;
@@ -45,6 +48,10 @@ class Graphics {
         this._snakeLayer.height = this._height;
     }
 
+///////////////////////////////////////////////////////////////////////////
+// Puzzle drawing /////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
+
     drawPuzzle () {
         this._ctx = this._puzzleLayer.getContext("2d");
 
@@ -57,61 +64,6 @@ class Graphics {
         this._drawPuzzleEdges(this._edges);
         // this._drawPuzzleBlocks(this._blocks);
     }
-
-    drawSnake (snake) {
-        this.clearSnake();
-
-        if (snake != null) {
-            let pathSize = this._puzzle.options.pathSize;
-            this._ctx = this._snakeLayer.getContext("2d");
-
-
-            let coord = this._puzzle.getNodeCoordinate(snake.nodeStack[0]);
-
-            this._drawCircle(coord.x, coord.y, Math.floor(START_RADIUS * pathSize),
-                             this._theme.snake);
-
-            let lastNode = snake.nodeStack[0];
-            let node = null;
-
-            // Draw all the lines (except the last one)
-            for (let i = 1; i < snake.nodeStack.length; i++) {
-                node = snake.nodeStack[i];
-
-                let lastCoord = this._puzzle.getNodeCoordinate(lastNode);
-                coord = this._puzzle.getNodeCoordinate(node);
-
-                this._drawLine(lastCoord.x, lastCoord.y, coord.x, coord.y, this._theme.snake, pathSize);
-
-                lastNode = node;
-            }
-
-            // Draw the last line
-            if (this._puzzle.nodeElements[snake.lastNode] == NODE_ELEMENT_TYPE.END) {
-
-            }
-            else {
-                if (snake.direction == DIRECTION.TOP || snake.direction == DIRECTION.BOTTOM) {
-                    this._drawLine(coord.x, coord.y, coord.x, coord.y + snake.movement, this._theme.snake, pathSize);
-                    this._drawCircle(coord.x, coord.y + snake.movement, Math.floor(pathSize / 1.5), "#A2A2A2");
-                    this._drawCircle(coord.x, coord.y + snake.movement, Math.floor(pathSize / 2), "#FFFFFF");
-                } else {
-                    this._drawLine(coord.x, coord.y, coord.x + snake.movement, coord.y, this._theme.snake, pathSize);
-                    this._drawCircle(coord.x + snake.movement, coord.y, Math.floor(pathSize / 1.5), "#A2A2A2");
-                    this._drawCircle(coord.x + snake.movement, coord.y, Math.floor(pathSize / 2), "#FFFFFF");
-                }
-            }
-        }
-    }
-
-    clearSnake () {
-        let ctx = this._snakeLayer.getContext("2d");
-        ctx.clearRect(0, 0, this.width, this.height);
-    }
-
-///////////////////////////////////////////////////////////////////////////
-// Puzzle drawing /////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////
 
     _drawPuzzleBackground () {
         this._drawRectangle(
@@ -181,6 +133,54 @@ class Graphics {
         // Not implemented
     }
 
+///////////////////////////////////////////////////////////////////////////
+// Snake drawing //////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
+
+    drawSnake (snake) {
+        this.clearSnake();
+
+        if (snake != null) {
+            this._ctx = this._snakeLayer.getContext("2d");
+
+            let node = this._puzzle.findNode(snake.stack[0]);
+
+            this._drawCircle(node.x, node.y, Math.floor(START_RADIUS * this._pathSize),
+                             this._theme.snake);
+
+            let lastNode = node;
+
+            // Draw all the lines (except the last one)
+            for (let i = 1; i < snake.stack.length; i++) {
+                node = this._puzzle.findNode(snake.stack[i]);
+
+                this._drawLine(lastNode.x, lastNode.y, node.x, node.y, this._theme.snake, this._pathSize);
+
+                lastNode = node;
+            }
+
+            // Draw the last line
+            // if (this._puzzle.nodes[snake.lastNode] == NODE_ELEMENT_TYPE.END) {
+
+            // }
+            // else {
+                if (snake.direction == DIRECTION.TOP || snake.direction == DIRECTION.BOTTOM) {
+                    this._drawLine(node.x, node.y, node.x, node.y + snake.movement, this._theme.snake, this._pathSize);
+                    this._drawCircle(node.x, node.y + snake.movement, Math.floor(this._pathSize / 1.5), "#A2A2A2");
+                    this._drawCircle(node.x, node.y + snake.movement, Math.floor(this._pathSize / 2), "#FFFFFF");
+                } else {
+                    this._drawLine(node.x, node.y, node.x + snake.movement, node.y, this._theme.snake, this._pathSize);
+                    this._drawCircle(node.x + snake.movement, node.y, Math.floor(this._pathSize / 1.5), "#A2A2A2");
+                    this._drawCircle(node.x + snake.movement, node.y, Math.floor(this._pathSize / 2), "#FFFFFF");
+                }
+            // }
+        }
+    }
+
+    clearSnake () {
+        let ctx = this._snakeLayer.getContext("2d");
+        ctx.clearRect(0, 0, this.width, this.height);
+    }
 
 ///////////////////////////////////////////////////////////////////////////
 // Element drawing ////////////////////////////////////////////////////////

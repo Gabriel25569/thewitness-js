@@ -1,12 +1,12 @@
 class Snake {
 
     constructor (start) {
-        this._nodeStack = new Array();
+        this._stack = new Array();
+        this._stack.push(start);
+
         this._directions = new Array();
-
-        this._nodeStack.push(start);
-
         this._direction = DIRECTION.NONE;
+
         this._movement = 0;
     }
 
@@ -14,23 +14,23 @@ class Snake {
         this._movement += amount;
     }
 
-    pushNode (node) {
-        this._nodeStack.push(node);
+    push (index) {
+        this._stack.push(index);
         this._directions.push(this._direction);
     }
 
-    popNode () {
-        let node = this._nodeStack.pop();
+    pop () {
+        let nodeIndex = this._stack.pop();
         let direction = this._directions.pop();
-        return {node: node, direction: direction};
+        return {index: nodeIndex, direction: direction};
     }
 
-    get nodeStack () {
-        return this._nodeStack;
+    get stack () {
+        return this._stack;
     }
 
     get lastNode () {
-        return this._nodeStack[this._nodeStack.length - 1];
+        return this._stack[this._stack.length - 1];
     }
 
     get lastDirection () {

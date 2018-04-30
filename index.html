@@ -28,22 +28,26 @@
             // puzzle.addElement(new Element(EDGE_ELEMENT_TYPE.HEXAGON, LOCATION_TYPE.EDGE, {x: 0, y: 1}));
             // puzzle.addElement(new Element(EDGE_ELEMENT_TYPE.HEXAGON, LOCATION_TYPE.EDGE, {x: 0, y: 5}));
 
+            let p = document.createElement("p");
+            p.innerHTML += "<b>Current puzzle options: </b>" + JSON.stringify(options) + "<br>";
+            p.innerHTML += "Check console for more info"
+            document.body.appendChild(p);
+            
 
             let theme = new Theme("#F9B700", "#3B280A", "#FFFFFF");
             let stage = document.getElementById("stage");
 
             Game.init(document.body, theme);
             Game.loadPuzzle(puzzle);
+            
+            console.log(puzzle);
+            console.log(theme);
+            console.log(Game);
         }
 
     </script>
 </head>
 <body>
-    <p><b>To-do</b></p>
-    <ul>
-        <li>Elementos</li>
-        <li>Verificação</li>
-    </ul>
-    <br>
+    <h1>Thanfor's Quest!</h1>
 </body>
 </html>

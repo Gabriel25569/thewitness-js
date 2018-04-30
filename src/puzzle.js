@@ -117,7 +117,7 @@ class Puzzle {
             let y = Math.floor(i / (this._options.columns + 1));
 
             if (y - 1 >= 0)
-                this._nodes[i].neighbors[DIRECTION.TOP] = i - this._options.columns + 1;
+                this._nodes[i].neighbors[DIRECTION.TOP] = i - this._options.columns - 1;
 
             if (x + 1 <= this._options.columns)
                 this._nodes[i].neighbors[DIRECTION.RIGHT] = i + 1;
@@ -152,14 +152,11 @@ class Puzzle {
     }
 
     addNodeElement (element, location) {
-        this._nodes[location].element = element;
+        this.findNode(location).element = element;
     }
 
     addEdgeElement (element, startNodeLocation, endNodeLocation) {
-        this._edges.find((e) => {
-            return e.i1 == startNodeLocation && 
-                   e.i2 == endNodeLocation
-        }).element = element;
+        this.findEdge(startNodeLocation, endNodeLocation).element = element;
     }
 
     addBlockElement (element, location) {
@@ -222,6 +219,14 @@ class Puzzle {
             x: this._getEdgeXCoordinate(i1, i2), 
             y: this._getEdgeYCoordinate(i1, i2)
         };
+    }
+
+    findNode (i) {
+        return this._nodes.find(e => { return e.i == i });
+    }
+
+    findEdge (i1, i2) {
+        return this._edges.find(e => { return e.i1 == i1 && e.i2 == i2 });
     }
 
     get rows () {
