@@ -1,10 +1,9 @@
 class Node {
     
-    constructor (i, x, y, rect) {
+    constructor (i, x, y) {
         this._i = i;
         this.x = x;
         this.y = y;
-        this.rect = rect;
         this._neighbors = new Array(4);
     }
 
@@ -34,10 +33,6 @@ class Node {
 
     get y () {
         return this._y;
-    }
-
-    get rect () {
-        return this._rect;
     }
 
     get element () {
@@ -92,6 +87,40 @@ class Edge {
 }
 
 class Block {
+    
+    constructor (i, x, y, rect) {
+        this._i = i;
+        this.x = x;
+        this.y = y;
+    }
+
+    set x (x) {
+        this._x = x;
+    }
+
+    set y (y) {
+        this._y = y;
+    }
+
+    set element (element) {
+        this._element = element;
+    }
+
+    get i () {
+        return this._i;
+    }
+
+    get x () {
+        return this._x;
+    }
+
+    get y () {
+        return this._y;
+    }
+
+    get element () {
+        return this._element;
+    }
 
 }
 
@@ -101,15 +130,48 @@ class Puzzle {
     constructor (options) {
         this._options = options;
 
-        let nodeCount = (this._options.rows + 1) * (this._options.columns + 1);
+        this._createNodes();
+        this._createEdges();
+        this._createBlocks();
+    }
 
+    addNodeElement (element, location) {
+        this.findNode(location).element = element;
+    }
+
+    addEdgeElement (element, startNodeLocation, endNodeLocation) {
+        this.findEdge(startNodeLocation, endNodeLocation).element = element;
+    }
+
+    addBlockElement (element, location) {
+        this.findBlock(location).element = element;
+    }
+
+    isStart (x, y) {
+        for (let i = 0; i < this._nodes.length; i++) {
+            if (this._nodes[i].element == NODE_ELEMENT_TYPE.START) {
+                let dx = x - this._nodes[i].x;
+                let dy = y - this._nodes[i].y;
+                let d = Math.sqrt((dx * dx) + (dy * dy));
+
+                if (d <= Math.floor(START_RADIUS * this._options.pathSize)) {
+                    return i;
+                }
+            }
+        }
+
+        return undefined;
+    }
+    
+    _createNodes() {
+        let nodeCount = (this._options.rows + 1) * (this._options.columns + 1);
         this._nodes = new Array(nodeCount);
+
         for (let i = 0; i < nodeCount; i++) {
             this._nodes[i] = new Node(
                 i,
                 this._getNodeXCoordinate(i),
-                this._getNodeYCoordinate(i),
-                this._getNodeRectangle(i)
+                this._getNodeYCoordinate(i)
             )
             
             // Add node neighbors
@@ -128,10 +190,14 @@ class Puzzle {
             if (x - 1 >= 0)
                 this._nodes[i].neighbors[DIRECTION.LEFT] = i - 1;
         }
+    }
 
+    _createEdges () {
+        let nodeCount = (this._options.rows + 1) * (this._options.columns + 1);
         this._edges = new Array();
+
         for (let i = 0; i < nodeCount; i++) {
-            if (i % this._options.rows + 1 < this._options.rows) {
+            if (i % this._options.rows + 1 <= this._options.rows) {
                 this._edges.push(new Edge(
                     i, i + 1,
                     this._getEdgeXCoordinate(i, i + 1),
@@ -147,27 +213,26 @@ class Puzzle {
                 ));
             }
         }
-
-        this._blocks = new Array();
     }
 
-    addNodeElement (element, location) {
-        this.findNode(location).element = element;
+    _createBlocks () {
+        let blockCount = this._options.rows * this._options.columns;
+        this._blocks = new Array(blockCount);
+
+        for (let i = 0; i < blockCount; i++) {
+            this._blocks[i] = new Block(
+                i,
+                this._getBlockXCoordinate(i),
+                this._getBlockYCoordinate(i)
+            );
+        }
     }
 
-    addEdgeElement (element, startNodeLocation, endNodeLocation) {
-        this.findEdge(startNodeLocation, endNodeLocation).element = element;
-    }
-
-    addBlockElement (element, location) {
-        // ...
-    }
-    
     _getNodeXCoordinate (i) { 
         return this._options.margin + 
                i % (this._options.columns + 1) * this._options.blockSize + 
                this._options.pathSize * (i % (this._options.columns + 1) + 0.5);
-        }
+    }
     
     _getNodeYCoordinate (i) { 
         return this._options.margin + 
@@ -179,16 +244,6 @@ class Puzzle {
         return {
             x: this._getNodeXCoordinate(i), 
             y: this._getNodeYCoordinate(i)
-        };
-    }
-
-    _getNodeRectangle (i) {
-        let coord = this._getNodeCoordinate(i);
-        return {
-            x: coord.x - this._options.pathSize / 2,
-            y: coord.y - this._options.pathSize / 2,
-            w: this._options.pathSize,
-            h: this._options.pathSize
         };
     }
 
@@ -221,12 +276,34 @@ class Puzzle {
         };
     }
 
+    _getBlockXCoordinate (i) {
+        return this._options.margin + 
+               (i % (this._options.columns)) * (this._options.blockSize) +
+               (i % (this._options.columns) + 1) * this._options.pathSize +
+               this._options.blockSize / 2;
+    }
+
+    _getBlockYCoordinate (i) {
+        return this._options.margin + 
+                Math.floor(i / (this._options.columns)) * (this._options.blockSize) +
+                Math.floor(i / (this._options.columns) + 1) * this._options.pathSize +
+                this._options.blockSize / 2;
+    }
+
+    _getBlockCoordinate (i) {
+        
+    }
+
     findNode (i) {
         return this._nodes.find(e => { return e.i == i });
     }
 
     findEdge (i1, i2) {
         return this._edges.find(e => { return e.i1 == i1 && e.i2 == i2 });
+    }
+
+    findBlock (i) {
+        return this._blocks.find(e => { return e.i == i });
     }
 
     get rows () {

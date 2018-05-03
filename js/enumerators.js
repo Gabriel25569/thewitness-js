@@ -15,12 +15,12 @@ const DIRECTION = {
 const NODE_ELEMENT_TYPE = {
     START: 0,
     END: 1,
-    HEXAGON: 20,
+    HEXAGON: 10,
 }
 
 const EDGE_ELEMENT_TYPE = {
-    EDGE_BREAK: 10,
-    HEXAGON: 20,
+    HEXAGON: 10,
+    EDGE_BREAK: 11,
 }
 
 const BLOCK_ELEMENT_TYPE = {

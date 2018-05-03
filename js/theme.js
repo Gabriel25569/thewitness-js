@@ -1,7 +1,3 @@
-// BACKGROUND: #F9B700
-// LINES: #3B280A
-
-
 class Theme {
     
     constructor (background, path, snake) {

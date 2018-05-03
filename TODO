@@ -1,28 +1,35 @@
 Todo:
     Snake:
-        ☐ Optimize snake movement at `Game._mouseMove()` @high 
-        ☐ Optimize snake code at `Graphics.drawSnake()` @critical
-        ☐ Draw snake at end node
+        ✔ Optimize snake code at `Graphics.drawSnake()` @critical @done(18-04-30 22:05)
+        ☐ Optimize snake movement at `Game._moveSnake()` @high 
+        ☐ Draw snake at `END` node
+        ☐ Find better names for functions and organize them
+        ☐ Break snake at `EDGE_BREAK` edge
 
     Graphics:
         ✔ Add support for node `HEXAGON` drawing @done(18-04-29 13:13)
+        ✔ Add support for edge `EDGE_BREAK` drawing @done(18-05-02 21:48)
+        ✔ Add support for block `STAR` drawing @done(18-05-02 21:44)
+        ✔ Add support for block `CANCELATOR` drawing @done(18-05-02 22:13)
         ☐ Add support for node `END` drawing
-        ☐ Add support for edge `EDGE_HALF_BREAK` drawing
         ☐ Add support for block `SQUARE` drawing
-        ☐ Add support for block `STAR` drawing
-        ☐ Add support for block `CANCELATOR` drawing
         ☐ Add support for colors
+        ☐ Remove default colors on element drawing (star, hexagon)
+        ☐ Remove default sizes on element drawing (star, hexagon)
     
     Puzzle:
         ✔ Find better names for WAYS / DIRECTION system @done(18-04-29 22:19)
+        ☐ Add support for elements with properties (example: tetris, black and white)
         ☐ Puzzle validation
         ☐ Puzzle editing UI
-        ☐ Add support for elements with properties (example: tetris, black and white)
+        ☐ Fix edges creation (some edges that doesn't exist are being created)
+        ☐ Fix different rows / columns puzzles that are not drawn correctly 
 
     Theme:
-        ☐ Add more options
+        ☐ Add more options (maybe store colors)
 
-
+    ☐ Overral UI improvement @possible
+    ☐ React.js @possible 
 
   
 

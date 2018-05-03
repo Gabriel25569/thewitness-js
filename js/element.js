@@ -1,3 +1,5 @@
+// In the future this will probably be useful
+
 // class Element {
 
 //     constructor(type) {

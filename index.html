@@ -5,14 +5,14 @@
     <link href="style.css" rel="stylesheet" type="text/css">
 
     <!-- Scripts do jogo -->
-    <script src="src/stats.min.js"></script>
-    <script src="src/snake.js"></script>
-    <script src="src/enumerators.js"></script>
-    <script src="src/element.js"></script>
-    <script src="src/theme.js"></script>
-    <script src="src/puzzle.js"></script>
-    <script src="src/graphics.js"></script>
-    <script src="src/game.js"></script>
+    <script src="js/stats.min.js"></script>
+    <script src="js/snake.js"></script>
+    <script src="js/enumerators.js"></script>
+    <script src="js/element.js"></script>
+    <script src="js/theme.js"></script>
+    <script src="js/puzzle.js"></script>
+    <script src="js/graphics.js"></script>
+    <script src="js/game.js"></script>
 
     <script type="text/javascript">
         window.onload = function main () {
@@ -21,33 +21,45 @@
             let puzzle = new Puzzle(options);
 
             puzzle.addNodeElement(NODE_ELEMENT_TYPE.START, 9);
+            puzzle.addNodeElement(NODE_ELEMENT_TYPE.START, 21);
             puzzle.addNodeElement(NODE_ELEMENT_TYPE.HEXAGON, 11);
-            puzzle.addEdgeElement(EDGE_ELEMENT_TYPE.HEXAGON, 0, 1)
-            // puzzle.addElement(new Element(EDGE_ELEMENT_TYPE.END, LOCATION_TYPE.EDGE, {x: 0, y: 5}));
-            // puzzle.addElement(new Element(NODE_ELEMENT_TYPE.START, LOCATION_TYPE.NODE, {x: 18}));
-            // puzzle.addElement(new Element(EDGE_ELEMENT_TYPE.HEXAGON, LOCATION_TYPE.EDGE, {x: 0, y: 1}));
-            // puzzle.addElement(new Element(EDGE_ELEMENT_TYPE.HEXAGON, LOCATION_TYPE.EDGE, {x: 0, y: 5}));
+            puzzle.addEdgeElement(EDGE_ELEMENT_TYPE.HEXAGON, 0, 1);
+            puzzle.addEdgeElement(EDGE_ELEMENT_TYPE.HEXAGON, 23, 24);
+            puzzle.addEdgeElement(EDGE_ELEMENT_TYPE.EDGE_BREAK, 15, 16);
+            puzzle.addEdgeElement(EDGE_ELEMENT_TYPE.EDGE_BREAK, 7, 12);
+            puzzle.addBlockElement(BLOCK_ELEMENT_TYPE.STAR, 0);
+            puzzle.addBlockElement(BLOCK_ELEMENT_TYPE.STAR, 6);
+            puzzle.addBlockElement(BLOCK_ELEMENT_TYPE.CANCELATOR, 8);
 
-            let p = document.createElement("p");
-            p.innerHTML += "<b>Current puzzle options: </b>" + JSON.stringify(options) + "<br>";
-            p.innerHTML += "Check console for more info"
-            document.body.appendChild(p);
-            
-
-            let theme = new Theme("#F9B700", "#3B280A", "#FFFFFF");
             let stage = document.getElementById("stage");
+            
+            let p = document.createElement("p");
+            p.innerHTML += "<b>Options: </b>" + JSON.stringify(options) + "<br>";
+            p.innerHTML += "Check console for more info"
+            stage.appendChild(p);
 
-            Game.init(document.body, theme);
+            // Initial puzzles theme
+            //let theme = new Theme("#F9B700", "#3B280A", "#FFFFFF");
+
+            // The Witness Solver theme
+            let theme = new Theme("#00E94F", "#026223", "#B1F514");
+
+            Game.init(stage, theme);
             Game.loadPuzzle(puzzle);
             
             console.log(puzzle);
             console.log(theme);
             console.log(Game);
+            
         }
 
     </script>
 </head>
 <body>
     <h1>Thanfor's Quest!</h1>
+    <div id="stage">
+
+    </div>
 </body>
+</center>
 </html>
